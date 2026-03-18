@@ -35,16 +35,6 @@
       color: white;
     }
 
-    .hero h1 {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
-
-    .hero p {
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-
     .hero button {
       padding: 12px 25px;
       font-size: 16px;
@@ -75,52 +65,220 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
+    .card button {
+      margin-top: 10px;
+      padding: 10px;
+      border: none;
+      background: #4facfe;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
     footer {
       background: #111;
       color: white;
       text-align: center;
       padding: 20px;
     }
+
+    /* LOGIN MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 10px;
+      background: #4facfe;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* ALERT */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff4d4d;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      display: none;
+      z-index: 3;
+      width: 250px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: rgba(255,255,255,0.3);
+      margin-top: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    #progress {
+      height: 100%;
+      width: 100%;
+      background: white;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <h2>Hub</h2>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
+<header>
+  <h2>Hub</h2>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>
 
-  <section class="hero">
-    <h1>Welcome to the Hub/h1>
-    <p>Build something amazing 🚀</p>
-    <button>Get Started</button>
-  </section>
+<section class="hero">
+  <h1>Welcome to the Hub</h1>
+  <p>Build something amazing 🚀</p>
+  <button onclick="openLogin()">Get Started</button>
+</section>
 
-  <section class="section">
-    <h2>Websites</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>Code Academy</h3>
-        <p>Teaches young kids the principles of coding.</p>
-      </div>
-      <div class="card">
-        <h3>Chat</h3>
-        <p>Chatbox for friend to collaborate.</p>
-      </div>
-      <div class="card">
-        <h3>Scalable</h3>
-        <p>Built to grow with your needs.</p>
-      </div>
+<section class="section">
+  <h2>Websites</h2>
+  <div class="cards">
+
+    <div class="card">
+      <h3>Code Academy</h3>
+      <p>Teaches young kids the principles of coding.</p>
+      <button onclick="goToAcademy()">Open</button>
     </div>
-  </section>
 
-  <footer>
-    <p>© 2026 My Website</p>
-  </footer>
+    <div class="card">
+      <h3>Chat</h3>
+      <p>Chatbox for friends to collaborate.</p>
+    </div>
+
+    <div class="card">
+      <h3>Scalable</h3>
+      <p>Built to grow with your needs.</p>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 My Website</p>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="message"></p>
+  </div>
+</div>
+
+<!-- ALERT -->
+<div id="alertBox" class="alert">
+  ⚠️ You need to login to continue
+  <div class="progress-bar">
+    <div id="progress"></div>
+  </div>
+</div>
+
+<script>
+  let isLoggedIn = localStorage.getItem("loggedIn") === "true";
+  let redirectAfterLogin = false;
+
+  const fakeUser = {
+    email: "test@example.com",
+    password: "123456"
+  };
+
+  function openLogin() {
+    document.getElementById("loginModal").style.display = "flex";
+  }
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const message = document.getElementById("message");
+
+    if (email === fakeUser.email && password === fakeUser.password) {
+      isLoggedIn = true;
+      localStorage.setItem("loggedIn", "true");
+
+      message.textContent = "✅ Logged in!";
+      message.style.color = "green";
+
+      setTimeout(() => {
+        document.getElementById("loginModal").style.display = "none";
+
+        if (redirectAfterLogin) {
+          window.location.href = "https://mastercoder360.github.io/Coding-Academy/";
+        }
+      }, 800);
+
+    } else {
+      message.textContent = "❌ Invalid login";
+      message.style.color = "red";
+    }
+  }
+
+  function goToAcademy() {
+    if (isLoggedIn) {
+      window.location.href = "https://mastercoder360.github.io/Coding-Academy/";
+    } else {
+      redirectAfterLogin = true;
+      showAlert();
+      openLogin();
+    }
+  }
+
+  function showAlert() {
+    const alertBox = document.getElementById("alertBox");
+    const progress = document.getElementById("progress");
+
+    alertBox.style.display = "block";
+
+    progress.style.transition = "none";
+    progress.style.width = "100%";
+    progress.offsetHeight;
+
+    progress.style.transition = "width 3s linear";
+    progress.style.width = "0%";
+
+    setTimeout(() => {
+      alertBox.style.display = "none";
+    }, 3000);
+  }
+</script>
 
 </body>
 </html>
