@@ -209,25 +209,43 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const SUPABASE_URL = "https://vvawpegbbxhonlijbtcn.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_VBFSDqPmi6_FpwxhzOtRmw__QXfEKtk";
+
+  // ✅ ONLY FIX: correct client creation
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   let isLoggedIn = localStorage.getItem("loggedIn") === "true";
   let redirectAfterLogin = null;
 
-  const fakeUser = {
-    email: "test@example.com",
-    password: "123456"
-  };
+  // Check existing session
+  supabaseClient.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      isLoggedIn = true;
+      localStorage.setItem("loggedIn", "true");
+    }
+  });
 
   function openLogin() {
     document.getElementById("loginModal").style.display = "flex";
   }
 
-  function login() {
+  async function login() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const message = document.getElementById("message");
 
-    if (email === fakeUser.email && password === fakeUser.password) {
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      message.textContent = "❌ " + error.message;
+      message.style.color = "red";
+    } else {
       isLoggedIn = true;
       localStorage.setItem("loggedIn", "true");
 
@@ -241,10 +259,6 @@
           window.location.href = redirectAfterLogin;
         }
       }, 800);
-
-    } else {
-      message.textContent = "❌ Invalid login";
-      message.style.color = "red";
     }
   }
 
