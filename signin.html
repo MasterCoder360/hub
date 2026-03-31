@@ -2,140 +2,110 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hub — Sign In</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      min-height: 100dvh;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
       background: #06060f;
-      font-family: Inter, system-ui, sans-serif;
-      color: #f0f0ff;
+      font-family: Arial, sans-serif;
+      color: white;
     }
-    .blob { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; }
-    .blob-1 { top: -15%; left: -10%; width: 55vw; height: 55vw; background: #6c47ff; opacity: 0.15; }
-    .blob-2 { bottom: -15%; right: -10%; width: 40vw; height: 40vw; background: #00c6ae; opacity: 0.10; }
+
     .card {
-      position: relative;
-      z-index: 1;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 1.25rem;
-      padding: 2.5rem 2rem;
-      width: 100%;
-      max-width: 400px;
+      background: rgba(255,255,255,0.05);
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
       text-align: center;
-      backdrop-filter: blur(12px);
     }
-    .icon {
-      width: 64px; height: 64px;
-      margin: 0 auto 1.25rem;
-      border-radius: 1rem;
-      border: 1.5px solid rgba(159,108,255,0.7);
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(108,71,255,0.1);
-    }
-    h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .subtitle { color: rgba(240,240,255,0.45); font-size: 0.875rem; margin-bottom: 1.75rem; }
-    form { display: flex; flex-direction: column; gap: 0.875rem; }
+
     input {
       width: 100%;
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid rgba(108,71,255,0.6);
-      border-radius: 3rem;
-      padding: 0.875rem 1.25rem;
-      font-size: 0.95rem;
-      color: #f0f0ff;
-      font-family: inherit;
-      outline: none;
-    }
-    input::placeholder { color: rgba(240,240,255,0.3); }
-    input:focus { border-color: rgba(159,108,255,0.9); }
-    .error { color: #f87171; font-size: 0.825rem; text-align: left; }
-    button[type="submit"] {
-      width: 100%;
-      padding: 0.875rem 1.25rem;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
       border: none;
-      border-radius: 3rem;
-      background: linear-gradient(90deg, #6c47ff, #00c6ae);
-      color: #fff;
-      font-size: 0.95rem;
-      font-weight: 600;
-      font-family: inherit;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #4facfe;
+      border: none;
+      color: white;
       cursor: pointer;
     }
-    button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
-    .success {
-      margin-top: 1.25rem;
-      padding: 1rem;
-      background: rgba(74,222,128,0.1);
-      border: 1px solid rgba(74,222,128,0.3);
-      border-radius: 0.75rem;
-      color: #4ade80;
-      font-size: 0.875rem;
-    }
+
+    .error { color: red; }
+    .success { color: lightgreen; }
   </style>
 </head>
+
 <body>
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
 
-  <div class="card">
-    <div class="icon">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(159,108,255,1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-      </svg>
-    </div>
-    <h1>Welcome back</h1>
-    <p class="subtitle">Sign in to continue to the Hub</p>
-    <form id="login-form">
-      <input type="email" id="email" placeholder="Email address" required autocomplete="email" />
-      <input type="password" id="password" placeholder="Password" required autocomplete="current-password" />
-      <p class="error" id="error-msg" style="display:none"></p>
-      <button type="submit" id="submit-btn">Sign In →</button>
-    </form>
-    <div class="success" id="success-msg" style="display:none">
-      Signed in successfully! You can close this page.
-    </div>
-  </div>
+<div class="card">
+  <h2>Sign In</h2>
 
-  <script>
-    const SUPABASE_URL  = "https://vvawpegbbxhonlijbtcn.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXdwZWdiYnhob25saWpidGNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjEyMjQsImV4cCI6MjA5MDM5NzIyNH0.ubIXtUu0EyBV1vzVF9XKXJZI_iXbtD-LVEvrNL5yFPs";
+  <form id="login-form">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <p id="error-msg" class="error" style="display:none;"></p>
+    <button type="submit">Sign In</button>
+  </form>
 
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  <p id="success-msg" class="success" style="display:none;">
+    Logged in! Redirecting...
+  </p>
+</div>
 
-    const form       = document.getElementById("login-form");
-    const errorMsg   = document.getElementById("error-msg");
-    const successMsg = document.getElementById("success-msg");
-    const submitBtn  = document.getElementById("submit-btn");
+<script>
+  const SUPABASE_URL = "https://vvawpegbbxhonlijbtcn.supabase.co";
+  const SUPABASE_ANON = "YOUR_KEY_HERE"; // keep your existing key
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errorMsg.style.display = "none";
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Please wait…";
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-      const email    = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  const form = document.getElementById("login-form");
+  const errorMsg = document.getElementById("error-msg");
+  const successMsg = document.getElementById("success-msg");
 
-      const { error } = await client.auth.signInWithPassword({ email, password });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      if (error) {
-        errorMsg.textContent = error.message;
-        errorMsg.style.display = "block";
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Sign In →";
-      } else {
-        form.style.display = "none";
-        successMsg.style.display = "block";
-      }
-    });
-  </script>
+    errorMsg.style.display = "none";
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { error } = await client.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      errorMsg.textContent = error.message;
+      errorMsg.style.display = "block";
+    } else {
+      localStorage.setItem("loggedIn", "true");
+
+      form.style.display = "none";
+      successMsg.style.display = "block";
+
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+
+      setTimeout(() => {
+        if (redirect) {
+          window.location.href = redirect;
+        } else {
+          window.location.href = "index.html";
+        }
+      }, 1000);
+    }
+  });
+</script>
+
 </body>
 </html>
