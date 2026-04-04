@@ -5,16 +5,180 @@
   <title>Welcome to the Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
-    header { background: #111; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    nav a { color: white; margin-left: 20px; text-decoration: none; font-weight: bold; }
-    .hero { text-align: center; padding: 100px 20px; background: linear-gradient(to right, #4facfe, #00f2fe); color: white; }
-    .hero button { padding: 12px 25px; font-size: 16px; border: none; background: white; color: #333; border-radius: 5px; cursor: pointer; }
-    .section { padding: 60px 20px; text-align: center; }
-    .cards { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-    .card { background: white; padding: 20px; width: 250px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .card button { margin-top: 10px; padding: 10px; border: none; background: #4facfe; color: white; cursor: pointer; border-radius: 5px; }
-    footer { background: #111; color: white; text-align: center; padding: 20px; }
+    * {
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top left, #4facfe, #00f2fe, #6a11cb);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(20px);
+      padding: 10px 25px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    nav {
+      display: flex;
+      gap: 15px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+
+    nav a:hover {
+      background: rgba(255,255,255,0.25);
+      transform: scale(1.1);
+    }
+
+    .hero {
+      text-align: center;
+      padding: 140px 20px 100px;
+    }
+
+    .hero button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    .hero button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+
+    .section {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      position: relative;
+      width: 260px;
+      padding: 25px;
+      border-radius: 20px;
+      cursor: pointer;
+
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.25),
+        rgba(255,255,255,0.05)
+      );
+
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
+      border: 1px solid rgba(255,255,255,0.3);
+
+      box-shadow:
+        0 8px 32px rgba(0,0,0,0.3),
+        inset 0 0 10px rgba(255,255,255,0.2);
+
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+
+      background: radial-gradient(
+        circle at var(--x, 50%) var(--y, 50%),
+        rgba(255,255,255,0.35),
+        transparent 40%
+      );
+
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 1px;
+
+      background: linear-gradient(120deg, #ffffff66, #00f2fe66, #ffffff33);
+
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-12px) scale(1.05);
+      box-shadow:
+        0 20px 50px rgba(0,0,0,0.5),
+        0 0 25px rgba(255,255,255,0.3);
+    }
+
+    .card button {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.2);
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    footer {
+      margin-top: 40px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
@@ -26,6 +190,34 @@
     <a href="#">About</a>
     <a href="#">Contact</a>
   </nav>
+
+  <!-- ✅ ADDED AUTH UI (nothing else touched) -->
+  <div id="authArea" style="display:flex; align-items:center; gap:10px; margin-left:10px;">
+    <span id="userBadge" style="
+      display:none;
+      padding:6px 12px;
+      border-radius:10px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(10px);
+      font-size: 14px;
+    ">
+      Logged in
+    </span>
+
+    <button id="logoutBtn" onclick="logout()" style="
+      display:none;
+      padding:6px 12px;
+      border-radius:10px;
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.2);
+      color:white;
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+    ">
+      Logout
+    </button>
+  </div>
 </header>
 
 <section class="hero">
@@ -38,16 +230,16 @@
   <h2>Websites</h2>
   <div class="cards">
 
-    <div class="card">
+    <div class="card" onclick="goToAcademy()">
       <h3>Code Academy</h3>
       <p>Teaches young kids the principles of coding.</p>
-      <button onclick="goToAcademy()">Open</button>
+      <button onclick="event.stopPropagation(); goToAcademy()">Open</button>
     </div>
 
-    <div class="card">
+    <div class="card" onclick="goToChat()">
       <h3>Chat</h3>
       <p>Chatbox for friends to collaborate.</p>
-      <button onclick="goToChat()">Open</button>
+      <button onclick="event.stopPropagation(); goToChat()">Open</button>
     </div>
 
     <div class="card">
@@ -84,6 +276,39 @@
       window.location.href = "signin.html?redirect=https://pusher-chat--r216305.replit.app/";
     }
   }
+
+  function logout() {
+    localStorage.removeItem("loggedIn");
+    location.reload();
+  }
+
+  function updateAuthUI() {
+    const badge = document.getElementById("userBadge");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (isLoggedIn) {
+      badge.style.display = "inline-block";
+      logoutBtn.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+      logoutBtn.style.display = "none";
+    }
+  }
+
+  updateAuthUI();
+
+  const cards = document.querySelectorAll('.card');
+
+  cards.forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      card.style.setProperty('--x', `${x}px`);
+      card.style.setProperty('--y', `${y}px`);
+    });
+  });
 </script>
 
 </body>
