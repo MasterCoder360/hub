@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🤗 Offline AI Chat - GitHub Pages</title>
-  <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -130,9 +129,9 @@
 <body>
 <div class="app">
   <h1>🤗 Offline AI Chat</h1>
-  <p class="subtitle">GitHub Pages • 100MB download → Works FOREVER offline!</p>
+  <p class="subtitle">GitHub Pages • Works OFFLINE after first download!</p>
   <div class="demo">
-    <button class="demo-btn" onclick="demoChat()">🎮 Try Demo Chat Now!</button>
+    <button class="demo-btn" id="demoBtn">🎮 Try Demo Chat Now!</button>
     <div style="margin-top: 15px; font-size: 1rem; opacity: 0.9;">
       ↓ Downloads GPT2 (30-60s first time)
     </div>
@@ -150,7 +149,7 @@
   <div class="section">
     <label>💭 Your Message</label>
     <textarea id="messageInput" placeholder="Say hello to AI..."></textarea>
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>🚀 Send to AI</button>
+    <button class="send-btn" id="sendBtn" disabled>🚀 Send to AI</button>
   </div>
   <div id="status" class="status ready">
     🎉 Ready! Click "Try Demo" to download AI ↓
@@ -161,6 +160,22 @@
 <script>
 let generator = null;
 let isReady = false;
+
+// Wait for Transformers to load
+function waitForTransformers() {
+  return new Promise((resolve) => {
+    if (typeof Transformers !== 'undefined') {
+      resolve();
+      return;
+    }
+    const check = setInterval(() => {
+      if (typeof Transformers !== 'undefined') {
+        clearInterval(check);
+        resolve();
+      }
+    }, 100);
+  });
+}
 
 async function initModel(modelName = 'gpt2') {
   const status = document.getElementById('status');
@@ -174,6 +189,9 @@ async function initModel(modelName = 'gpt2') {
   sendBtn.disabled = true;
 
   try {
+    // Wait for library to be ready
+    await waitForTransformers();
+    
     generator = await Transformers.TaskFactory('text-generation', modelName, {
       quantized: true,
       progress_callback: (data) => {
@@ -181,6 +199,10 @@ async function initModel(modelName = 'gpt2') {
           const percent = Math.round((data.file/2) * 100);
           progressBar.style.width = `${Math.min(percent, 100)}%`;
           status.textContent = `📥 Downloading ${modelName}... ${percent}%`;
+        } else if (data.status === 'progress') {
+          const percent = Math.round(data.progress * 100);
+          progressBar.style.width = `${percent}%`;
+          status.textContent = `🔄 Processing ${modelName}... ${percent}%`;
         }
       }
     });
@@ -192,6 +214,7 @@ async function initModel(modelName = 'gpt2') {
     sendBtn.textContent = '🚀 Send to AI';
     
   } catch (error) {
+    console.error('Model error:', error);
     status.textContent = `❌ Load failed: ${error.message}`;
     status.className = 'status error';
     sendBtn.disabled = true;
@@ -230,11 +253,9 @@ async function sendMessage() {
   const prompt = input.value.trim();
   if (!prompt || !isReady) return;
   
-  // User message
   addMessage('user', prompt);
   input.value = '';
   
-  // UI
   btn.disabled = true;
   btn.textContent = '🤔 AI Thinking...';
   status.textContent = '🧠 Generating...';
@@ -246,6 +267,7 @@ async function sendMessage() {
     status.textContent = '✅ Ready for next message!';
     status.className = 'status ready';
   } catch (error) {
+    console.error('Generate error:', error);
     addMessage('ai', `❌ Error: ${error.message}`);
     status.textContent = '❌ Error - try Demo again';
     status.className = 'status error';
@@ -257,26 +279,29 @@ async function sendMessage() {
 
 async function demoChat() {
   const model = document.getElementById('modelSelect').value;
+  const demoBtn = document.getElementById('demoBtn');
+  
+  demoBtn.disabled = true;
+  demoBtn.textContent = '⏳ Loading...';
   
   if (isReady) {
-    // Demo conversation
     addMessage('user', 'Hello AI!');
-    setTimeout(async () => {
-      const response = await generateResponse('Hello AI!');
-      addMessage('ai', response);
-    }, 500);
+    const response = await generateResponse('Hello AI! How are you?');
+    addMessage('ai', response);
+    demoBtn.disabled = false;
+    demoBtn.textContent = '🎮 Try Demo Chat Now!';
     return;
   }
   
-  // Load model
   await initModel(model);
+  demoBtn.disabled = false;
+  demoBtn.textContent = '🎮 Try Demo Chat Now!';
 }
 
-// Global functions for onclick
-window.sendMessage = sendMessage;
-window.demoChat = demoChat;
+// Event listeners
+document.getElementById('demoBtn').onclick = demoChat;
+document.getElementById('sendBtn').onclick = sendMessage;
 
-// Enter key
 document.getElementById('messageInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -284,10 +309,12 @@ document.getElementById('messageInput').addEventListener('keydown', e => {
   }
 });
 
-// Auto demo on load
-window.onload = () => {
-  setTimeout(demoChat, 1000);
-};
+// Auto demo after page loads
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (!isReady) demoChat();
+  }, 1500);
+});
 </script>
 </body>
 </html>
