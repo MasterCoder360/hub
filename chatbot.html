@@ -130,6 +130,7 @@
   <div class="section">
     <label>🤖 AI Model</label>
     <select id="modelSelect">
+      <!-- ✅ FIX 2: Correct model names for server -->
       <option value="Xenova/distilgpt2">⚡ Fast (Recommended)</option>
       <option value="Xenova/gpt2">🔥 Smarter</option>
     </select>
@@ -152,7 +153,7 @@
 
 <script>
 let isSending = false;
-const SERVER_URL = 'https://ai-server-ivory.vercel.app/api/chat'; // ← CHANGE THIS!
+const SERVER_URL = 'https://ai-server-ivory.vercel.app/api/chat'; // ✅ FIX 1: Correct URL (no .js)
 
 function updateStatus(text, type='ready') {
   document.getElementById('status').innerHTML = text;
