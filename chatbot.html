@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🤗 Offline AI Chat - GitHub Pages</title>
+  <title>🤗 AI Chat - GitHub + Vercel</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -14,19 +14,18 @@
       padding: 20px;
     }
     .app {
-      max-width: 900px;
+      max-width: 800px;
       margin: 0 auto;
       background: rgba(255,255,255,0.03);
       backdrop-filter: blur(25px);
       border-radius: 25px;
-      padding: 40px;
+      padding: 30px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.08);
     }
     h1 {
       text-align: center;
-      font-size: 2.8rem;
-      margin-bottom: 15px;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
       background: linear-gradient(45deg, #00ff88, #00cc6a);
       -webkit-background-clip: text;
       background-clip: text;
@@ -34,30 +33,20 @@
     }
     .subtitle {
       text-align: center;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       opacity: 0.9;
-      margin-bottom: 30px;
-    }
-    .demo {
-      background: rgba(0,255,136,0.1);
-      border: 2px solid rgba(0,255,136,0.3);
-      border-radius: 20px;
-      padding: 25px;
-      margin-bottom: 30px;
-      text-align: center;
+      margin-bottom: 25px;
     }
     .demo-btn, .send-btn {
       background: linear-gradient(45deg, #00ff88, #00cc6a);
       border: none;
-      padding: 15px 40px;
+      padding: 15px 30px;
       border-radius: 50px;
       color: #000;
       font-weight: 700;
-      font-size: 1.1rem;
       cursor: pointer;
       transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      font-size: 1rem;
     }
     .demo-btn:hover, .send-btn:hover:not(:disabled) { 
       transform: scale(1.05); 
@@ -65,240 +54,197 @@
     }
     .send-btn {
       width: 100%;
-      padding: 20px;
-      font-size: 1.2rem;
-      font-weight: 800;
-      margin-top: 15px;
+      padding: 18px;
+      font-size: 1.1rem;
+      margin-top: 12px;
     }
     .send-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .progress {
-      width: 100%; height: 8px; background: rgba(255,255,255,0.1);
-      border-radius: 4px; overflow: hidden; margin: 15px 0;
-    }
-    .progress-bar {
-      height: 100%; background: linear-gradient(90deg, #00ff88, #00cc6a);
-      width: 0%; transition: width 0.3s; border-radius: 4px;
-    }
-    .section {
-      margin-bottom: 25px; padding: 25px;
-      background: rgba(255,255,255,0.02); border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    label { display: block; margin-bottom: 12px; font-weight: 600; color: #fff; }
-    select, textarea {
-      width: 100%; padding: 18px; border: 2px solid rgba(255,255,255,0.15);
-      border-radius: 15px; background: rgba(255,255,255,0.06); color: #fff;
-      font-size: 1.1rem; font-family: inherit; transition: all 0.3s;
-    }
-    select:focus, textarea:focus {
-      outline: none; border-color: #00ff88;
-      box-shadow: 0 0 0 4px rgba(0,255,136,0.2);
-    }
-    textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
-    .chat {
-      height: 450px; overflow-y: auto; background: rgba(0,0,0,0.25);
-      border-radius: 20px; padding: 25px; margin-top: 25px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .message {
-      margin-bottom: 20px; padding: 20px; border-radius: 18px;
-      line-height: 1.6; animation: fadeIn 0.3s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .user-msg {
-      background: rgba(0,255,136,0.15); border-left: 5px solid #00ff88;
-      margin-left: 15%;
-    }
-    .ai-msg {
-      background: rgba(100,200,255,0.15); border-left: 5px solid #00d4ff;
-      margin-right: 15%;
-    }
     .status {
-      padding: 20px; border-radius: 15px; margin: 20px 0;
-      text-align: center; font-weight: 700; font-size: 1.1rem;
+      padding: 15px;
+      border-radius: 12px;
+      margin: 20px 0;
+      text-align: center;
+      font-weight: 600;
     }
     .status.ready { background: rgba(0,255,136,0.2); color: #00ff88; border: 2px solid #00ff88; }
     .status.loading { background: rgba(255,193,7,0.3); color: #ffc107; border: 2px solid #ffc107; }
     .status.success { background: rgba(76,175,80,0.3); color: #4caf50; border: 2px solid #4caf50; }
     .status.error { background: rgba(244,67,54,0.3); color: #f44336; border: 2px solid #f44336; }
+    .section {
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    label { display: block; margin-bottom: 10px; font-weight: 600; color: #fff; }
+    select, textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 1rem;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .chat {
+      height: 400px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.25);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .message {
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 15px;
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .user-msg { background: rgba(0,255,136,0.15); border-left: 4px solid #00ff88; margin-left: 10%; }
+    .ai-msg { background: rgba(100,200,255,0.15); border-left: 4px solid #00d4ff; margin-right: 10%; }
+    .server-status {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      text-align: center;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 <div class="app">
-  <h1>🤗 Offline AI Chat</h1>
-  <p class="subtitle">GitHub Pages • Works OFFLINE after first download!</p>
-  <div class="demo">
-    <button class="demo-btn" id="demoBtn">🎮 Try Demo Chat Now!</button>
-    <div style="margin-top: 15px; font-size: 1rem; opacity: 0.9;">
-      ↓ Downloads GPT2 (30-60s first time)
-    </div>
-  </div>
-  <div class="progress" id="progress" style="display: none;">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
+  <h1>🤗 AI Chat</h1>
+  <p class="subtitle">GitHub Pages Frontend + Vercel AI Server ⚡</p>
+  
+  <button class="demo-btn" id="demoBtn" style="display:block; margin:0 auto 20px;">🎮 Test AI Server</button>
+  
   <div class="section">
-    <label>🎯 AI Model</label>
+    <label>🤖 AI Model</label>
     <select id="modelSelect">
-      <option value="gpt2">⚡ GPT-2 (Chat)</option>
-      <option value="distilgpt2">🚀 DistilGPT-2 (Faster)</option>
+      <option value="Xenova/distilgpt2">⚡ Fast (Recommended)</option>
+      <option value="Xenova/gpt2">🔥 Smarter</option>
     </select>
   </div>
+  
   <div class="section">
     <label>💭 Your Message</label>
-    <textarea id="messageInput" placeholder="Say hello to AI..."></textarea>
-    <button class="send-btn" id="sendBtn" disabled>🚀 Send to AI</button>
+    <textarea id="messageInput" placeholder="Type your message... (Press Enter to send)"></textarea>
+    <button class="send-btn" id="sendBtn">🚀 Send to AI</button>
   </div>
+  
   <div id="status" class="status ready">
-    🎉 Ready! Click "Try Demo" to download AI ↓
+    🎉 Ready! Click "Test AI Server" or start chatting
+  </div>
+  <div class="server-status">
+    🔗 Server: <span id="serverUrl">Not connected</span>
   </div>
   <div id="chat" class="chat"></div>
 </div>
 
 <script>
-let generator = null;
-let isReady = false;
+let isSending = false;
+const SERVER_URL = 'https://ai-server-ivory.vercel.app/'; // ← CHANGE THIS!
 
-// Wait for Transformers to load
-function waitForTransformers() {
-  return new Promise((resolve) => {
-    if (typeof Transformers !== 'undefined') {
-      resolve();
-      return;
-    }
-    const check = setInterval(() => {
-      if (typeof Transformers !== 'undefined') {
-        clearInterval(check);
-        resolve();
-      }
-    }, 100);
-  });
-}
-
-async function initModel(modelName = 'gpt2') {
-  const status = document.getElementById('status');
-  const progress = document.getElementById('progress');
-  const progressBar = document.getElementById('progressBar');
-  const sendBtn = document.getElementById('sendBtn');
-  
-  status.textContent = `📥 Loading ${modelName.toUpperCase()}...`;
-  status.className = 'status loading';
-  progress.style.display = 'block';
-  sendBtn.disabled = true;
-
-  try {
-    // Wait for library to be ready
-    await waitForTransformers();
-    
-    generator = await Transformers.TaskFactory('text-generation', modelName, {
-      quantized: true,
-      progress_callback: (data) => {
-        if (data.status === 'downloading') {
-          const percent = Math.round((data.file/2) * 100);
-          progressBar.style.width = `${Math.min(percent, 100)}%`;
-          status.textContent = `📥 Downloading ${modelName}... ${percent}%`;
-        } else if (data.status === 'progress') {
-          const percent = Math.round(data.progress * 100);
-          progressBar.style.width = `${percent}%`;
-          status.textContent = `🔄 Processing ${modelName}... ${percent}%`;
-        }
-      }
-    });
-    
-    isReady = true;
-    status.textContent = `✅ ${modelName.toUpperCase()} READY! (Offline forever)`;
-    status.className = 'status success';
-    sendBtn.disabled = false;
-    sendBtn.textContent = '🚀 Send to AI';
-    
-  } catch (error) {
-    console.error('Model error:', error);
-    status.textContent = `❌ Load failed: ${error.message}`;
-    status.className = 'status error';
-    sendBtn.disabled = true;
-  }
-}
-
-async function generateResponse(prompt) {
-  if (!generator || !isReady) {
-    throw new Error('AI not ready - click Demo first');
-  }
-  
-  const output = await generator(prompt, {
-    max_new_tokens: 80,
-    temperature: 0.8,
-    do_sample: true,
-    pad_token_id: generator.tokenizer.eos_token_id
-  });
-  
-  return output[0].generated_text.replace(prompt, '').trim().slice(0, 300);
+function updateStatus(text, type='ready') {
+  document.getElementById('status').innerHTML = text;
+  document.getElementById('status').className = `status ${type}`;
 }
 
 function addMessage(sender, text) {
   const chat = document.getElementById('chat');
   const div = document.createElement('div');
-  div.className = `message ${sender === 'user' ? 'user-msg' : 'ai-msg'}`;
-  div.innerHTML = `<strong>${sender === 'user' ? '👤 You' : '🤖 AI'}:</strong><br>${text}`;
+  div.className = `message ${sender === 'You' ? 'user-msg' : 'ai-msg'}`;
+  div.innerHTML = `<strong>${sender}:</strong> ${text}`;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-async function sendMessage() {
-  const input = document.getElementById('messageInput');
-  const btn = document.getElementById('sendBtn');
-  const status = document.getElementById('status');
-  
-  const prompt = input.value.trim();
-  if (!prompt || !isReady) return;
-  
-  addMessage('user', prompt);
-  input.value = '';
-  
-  btn.disabled = true;
-  btn.textContent = '🤔 AI Thinking...';
-  status.textContent = '🧠 Generating...';
-  status.className = 'status loading';
+async function chatWithAI(prompt, model='Xenova/distilgpt2') {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 25000);
 
   try {
-    const response = await generateResponse(prompt);
-    addMessage('ai', response);
-    status.textContent = '✅ Ready for next message!';
-    status.className = 'status ready';
+    const res = await fetch(SERVER_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt, model}),
+      signal: controller.signal
+    });
+    
+    if (!res.ok) throw new Error(`Server ${res.status}`);
+    const data = await res.json();
+    return data.response || 'No response received';
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('Request timeout');
+    throw new Error(e.message || 'Connection failed');
+  }
+}
+
+async function sendMessage() {
+  if (isSending) return;
+  
+  const input = document.getElementById('messageInput');
+  const btn = document.getElementById('sendBtn');
+  const prompt = input.value.trim();
+  
+  if (!prompt) return;
+  
+  isSending = true;
+  input.value = '';
+  btn.disabled = true;
+  btn.textContent = '🤔 AI Thinking...';
+  updateStatus('🧠 AI is responding...', 'loading');
+  
+  addMessage('You', prompt);
+  
+  try {
+    const model = document.getElementById('modelSelect').value;
+    const response = await chatWithAI(prompt, model);
+    addMessage('🤖 AI', response);
+    updateStatus('✅ Message sent! Ready for more.', 'success');
   } catch (error) {
-    console.error('Generate error:', error);
-    addMessage('ai', `❌ Error: ${error.message}`);
-    status.textContent = '❌ Error - try Demo again';
-    status.className = 'status error';
+    console.error('AI Error:', error);
+    addMessage('🤖 AI', `❌ Error: ${error.message}`);
+    updateStatus('❌ Connection failed - check server URL', 'error');
   } finally {
+    isSending = false;
     btn.disabled = false;
     btn.textContent = '🚀 Send to AI';
   }
 }
 
 async function demoChat() {
-  const model = document.getElementById('modelSelect').value;
-  const demoBtn = document.getElementById('demoBtn');
+  const btn = document.getElementById('demoBtn');
+  btn.disabled = true;
+  btn.textContent = '🧪 Testing...';
+  updateStatus('🚀 Connecting to AI server...', 'loading');
   
-  demoBtn.disabled = true;
-  demoBtn.textContent = '⏳ Loading...';
+  document.getElementById('serverUrl').textContent = SERVER_URL;
   
-  if (isReady) {
-    addMessage('user', 'Hello AI!');
-    const response = await generateResponse('Hello AI! How are you?');
-    addMessage('ai', response);
-    demoBtn.disabled = false;
-    demoBtn.textContent = '🎮 Try Demo Chat Now!';
-    return;
+  try {
+    const response = await chatWithAI('Hello AI! Tell me a fun fact.', 'Xenova/distilgpt2');
+    addMessage('You', 'Hello AI! Tell me a fun fact.');
+    addMessage('🤖 AI', response);
+    updateStatus('🎉 Server connected! Chat works perfectly!', 'success');
+  } catch (error) {
+    addMessage('🤖 AI', `❌ Server error: ${error.message}<br><br>👉 Update SERVER_URL in code`);
+    updateStatus('❌ Server not responding - check Vercel URL', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🎮 Test AI Server';
   }
-  
-  await initModel(model);
-  demoBtn.disabled = false;
-  demoBtn.textContent = '🎮 Try Demo Chat Now!';
 }
 
-// Event listeners
+// Event Listeners
 document.getElementById('demoBtn').onclick = demoChat;
 document.getElementById('sendBtn').onclick = sendMessage;
 
@@ -309,12 +255,10 @@ document.getElementById('messageInput').addEventListener('keydown', e => {
   }
 });
 
-// Auto demo after page loads
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    if (!isReady) demoChat();
-  }, 1500);
-});
+// Auto demo after load
+window.onload = () => {
+  setTimeout(demoChat, 1500);
+};
 </script>
 </body>
 </html>
