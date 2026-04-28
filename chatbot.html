@@ -6,7 +6,6 @@
   <title>AI Assistant</title>
   <style>
       :root {
-          /* Glass Colors */
           --glass-bg: rgba(255, 255, 255, 0.15);
           --glass-border: rgba(255, 255, 255, 0.3);
           --text-primary: #ffffff;
@@ -21,7 +20,6 @@
       body {
           margin: 0;
           font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          /* A colorful animated background helps the glass look real */
           background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #581c87 100%);
           background-attachment: fixed;
           color: var(--text-primary);
@@ -30,7 +28,6 @@
           height: 100vh;
       }
 
-      /* Top Navigation Bar */
       .navbar {
           display: flex;
           align-items: center;
@@ -50,7 +47,6 @@
           text-shadow: 0 0 10px rgba(125, 211, 252, 0.5);
       }
 
-      /* Chat Container */
       .chat-container {
           flex: 1;
           display: flex;
@@ -76,7 +72,6 @@
           gap: 20px;
       }
 
-      /* Message Styling */
       .message {
           max-width: 80%;
           line-height: 1.6;
@@ -98,7 +93,6 @@
           color: #e2e8f0;
       }
 
-      /* Input Area */
       .input-wrapper {
           padding: 25px;
           background: rgba(0, 0, 0, 0.1);
@@ -152,7 +146,22 @@
           height: 15px;
       }
 
-      /* Scrollbar Styling */
+      .clear-chat {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid var(--glass-border);
+          color: var(--text-secondary);
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-left: auto;
+      }
+      .clear-chat:hover {
+          background: rgba(255, 0, 0, 0.2);
+          color: var(--text-primary);
+      }
+
       #messages::-webkit-scrollbar { width: 6px; }
       #messages::-webkit-scrollbar-thumb {
           background: var(--glass-border);
@@ -164,13 +173,14 @@
 
   <div class="navbar">
       <div class="logo">SearchAI</div>
-      <div style="color: var(--text-secondary)">Second Edition</div>
+      <div style="color: var(--text-secondary)">Memory Enabled</div>
+      <button class="clear-chat" id="clearChat">Clear Chat</button>
   </div>
 
   <div class="chat-container">
       <div id="messages">
           <div style="text-align:center; color: var(--text-secondary); margin-top: 40px; font-style: italic;">
-              How can I help you today?
+              How can I help you today? 
           </div>
       </div>
 
@@ -178,7 +188,7 @@
           <div id="status" class="status-indicator"></div>
           <div class="search-bar">
               <input id="input" type="text" placeholder="Ask a question..." autocomplete="off">
-              <button id="send">Search</button>
+              <button id="send">Send</button>
           </div>
       </div>
   </div>
@@ -186,54 +196,111 @@
 <script>
 let sending = false;
 const apiUrl = 'https://ai-server-ivory.vercel.app/api/chat';
+let conversationHistory = [];
+const MAX_HISTORY = 15; // Reduced to prevent issues
 
 function addMessage(text, isUser) {
   const msgDiv = document.createElement('div');
   msgDiv.className = 'message ' + (isUser ? 'user-message' : 'ai-message');
   msgDiv.innerHTML = text.replace(/\n/g, '<br>');
   document.getElementById('messages').appendChild(msgDiv);
-  const messages = document.getElementById('messages');
-  messages.scrollTop = messages.scrollHeight;
+  document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+}
+
+function clearChat() {
+  document.getElementById('messages').innerHTML = `
+    <div style="text-align:center; color: var(--text-secondary); margin-top: 40px; font-style: italic;">
+        Chat cleared! How can I help you now? 
+    </div>
+  `;
+  conversationHistory = [];
+}
+
+function buildPromptWithHistory(userInput) {
+  // Build context from history
+  let context = "";
+  if (conversationHistory.length > 0) {
+    context = "Previous conversation:\n";
+    conversationHistory.slice(-MAX_HISTORY + 1).forEach(msg => {
+      const role = msg.role === 'user' ? 'You: ' : 'AI: ';
+      context += `${role}"${msg.content}"\n`;
+    });
+    context += "\nNow respond to this new question:\n";
+  }
+  
+  return `${context}${userInput}`;
 }
 
 async function send() {
   if (sending) return;
+  
   const input = document.getElementById('input');
   const btn = document.getElementById('send');
   const status = document.getElementById('status');
   const text = input.value.trim();
-   if (!text) return;
+  
+  if (!text) return;
 
   sending = true;
   input.value = '';
   btn.disabled = true;
-  status.innerText = 'Analyzing neural pathways...';
-   addMessage(text, true);
+  status.innerText = 'Thinking...';
+
+  // Add user message to history and UI
+  const userMessage = { role: 'user', content: text };
+  conversationHistory.push(userMessage);
+  addMessage(text, true);
 
   try {
-      const res = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: text, model: 'Xenova/distilgpt2' })
-      });
-      const data = await res.json();
-      addMessage(data.response || 'No information found.');
-      status.innerText = '';
-  } catch (e) {
-      addMessage('Error connecting to service.');
-      status.innerText = 'Connection Error';
+    // Build full prompt with conversation history
+    const fullPrompt = buildPromptWithHistory(text);
+    
+    console.log('Sending prompt:', fullPrompt); // Debug log
+    
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        prompt: fullPrompt,  // Your API expects 'prompt'
+        model: 'Xenova/distilgpt2'
+      })
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
+    const data = await res.json();
+    console.log('API Response:', data); // Debug log
+    
+    const aiResponse = data.response || data.answer || data.text || 'Sorry, I couldn\'t process that.';
+    
+    // Add AI response to history and UI
+    const aiMessage = { role: 'assistant', content: aiResponse };
+    conversationHistory.push(aiMessage);
+    addMessage(aiResponse, false);
+    
+    status.innerText = '';
+    
+  } catch (error) {
+    console.error('API Error:', error);
+    addMessage(`Error: ${error.message}. Please try again.`, false);
+    status.innerText = 'Connection failed';
   } finally {
-      sending = false;
-      btn.disabled = false;
+    sending = false;
+    btn.disabled = false;
   }
 }
 
+// Event listeners
 document.getElementById('send').onclick = send;
 document.getElementById('input').onkeydown = e => {
-  if (e.key === 'Enter') send();
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
 };
+document.getElementById('clearChat').onclick = clearChat;
 </script>
 </body>
 </html>
-
-
